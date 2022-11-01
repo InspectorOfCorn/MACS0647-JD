@@ -7,11 +7,10 @@ def save():
     username = str(user_entry.get())
     password = str(pw_entry.get())
     #Create a list that that saves all three to a csv file.
-    new_list = [website,username,password]
-    df = []
-    df.append(new_list)
-    txt_file = open(file="./txt/file.txt", mode="w")
-    txt_file.writelines(str(df))
+    with open(file="./txt/file.txt", mode="a") as txt_file:
+        txt_file.write(str(f"{website} | {username} | {password}\n"))
+        web_entry.delete(0,END)
+        pw_entry.delete(0,END)
     
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -43,6 +42,7 @@ web_entry = Entry(text="",width=35)
 web_entry.grid(row=1,column=1,columnspan=2)
 
 user_entry = Entry(text="",width=35)
+user_entry.insert(0, "bilal.m.omar@gmail.com")
 user_entry.grid(row=2, column=1,columnspan=2)
 
 pw_entry = Entry(text="", width=20)
