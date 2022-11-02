@@ -1,16 +1,40 @@
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
+import pyperclip
+from random import choice, randint, shuffle
+def generate_password():
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
+    password_letters = [choice(letters) for _ in range(randint(8, 10))]
+    password_symbols = [choice(symbols) for _ in range(randint(2, 4))]
+    password_numbers = [choice(numbers) for _ in range(randint(2, 4))]
+
+    password_list = password_letters + password_symbols + password_numbers
+    shuffle(password_list)
+
+    password = "".join(password_list)
+    entry_entry = pw_entry.insert(0, password)
+    pyperclip.copy(password)
+    
 # ---------------------------- SAVE PASSWORD ------------------------------- #
-
+from tkinter import messagebox
 def save():
+    
     website = str(web_entry.get())
     username = str(user_entry.get())
     password = str(pw_entry.get())
-    #Create a list that that saves all three to a csv file.
-    with open(file="./txt/file.txt", mode="a") as txt_file:
-        txt_file.write(str(f"{website} | {username} | {password}\n"))
-        web_entry.delete(0,END)
-        pw_entry.delete(0,END)
+    
+    if len(website) == 0 or len(password) == 0:
+        messagebox.showinfo(title="Oops",message="Please make sure you haven't left any fields empty.")
+    else:
+        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail/Username: {username}\nPassword: {password}")
+        
+        if is_ok:
+            with open(file="./txt/file.txt", mode="a") as txt_file:
+                txt_file.write(str(f"{website} | {username} | {password}\n"))
+            web_entry.delete(0,END)
+            pw_entry.delete(0,END)
     
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -53,7 +77,7 @@ pw_entry.grid(row=3,column=1)
 add_button = Button(text="Add", width=36, command=save)
 add_button.grid(row=4,column=1,columnspan=2)
 
-password_button = Button(text="Generate Password")
+password_button = Button(text="Generate Password",command=generate_password)
 password_button.grid(row=3, column=2)
 
 
