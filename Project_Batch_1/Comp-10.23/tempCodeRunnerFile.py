@@ -1,1 +1,4 @@
-new_dict = {new_key:new_value for item in list}
+
+word = input("Enter a word: ").upper()
+output_list = [phonetic_dict[letter] for letter in word]
+print(output_list)

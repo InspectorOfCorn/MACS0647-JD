@@ -2,6 +2,7 @@
 import pyperclip
 from random import choice, randint, shuffle
 def generate_password():
+    pw_entry.delete(0,END)
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
@@ -19,23 +20,57 @@ def generate_password():
     
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 from tkinter import messagebox
+import json
+
 def save():
-    
     website = str(web_entry.get())
     username = str(user_entry.get())
     password = str(pw_entry.get())
+    new_data = {website: {
+        "email": username,
+        "password": password
+    }}
     
     if len(website) == 0 or len(password) == 0:
         messagebox.showinfo(title="Oops",message="Please make sure you haven't left any fields empty.")
     else:
-        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail/Username: {username}\nPassword: {password}")
-        
-        if is_ok:
-            with open(file="./txt/file.txt", mode="a") as txt_file:
-                txt_file.write(str(f"{website} | {username} | {password}\n"))
+        try:
+            with open(file="./json/data.json", mode="r") as file_data:
+                # json.dump(new_data, file_data, indent=4)
+                #Reading old data
+                data = json.load(file_data)
+                #Updating data with new data
+                data.update(new_data)
+        except FileNotFoundError: 
+            with open(file="./json/data.json", mode="w") as file_data:
+                json.dump(new_data, file_data, indent=4)
+        else:
+            data.update(new_data)       
+            with open(file="./json/data.json", mode="w") as file_data:
+                #Saving updated data
+                json.dump(data, file_data, indent=4)
+        finally:
             web_entry.delete(0,END)
             pw_entry.delete(0,END)
-    
+def search():
+    with open(file="./json/data.json", mode="r") as file_data:
+        data = json.load(file_data)
+        website = str(web_entry.get())
+        try:
+            login_info = data[website]
+            login_email = login_info["email"]
+            login_password = login_info["password"]
+            messagebox.showinfo(title="Login Info", message=f"Email: {login_email}\nPassword: {login_password}\nThe password has been saved to your clipboard.")
+            pyperclip.copy(login_password)
+        except KeyError:
+            if website == "":
+                messagebox.showinfo(title="Oops", message="You have to put something.")
+            else:
+                messagebox.showinfo(title="Oops", message="That isn't in our database.")
+        finally:
+            web_entry.delete(0,END)
+        
+        
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -69,16 +104,19 @@ user_entry = Entry(text="",width=35)
 user_entry.insert(0, "bilal.m.omar@gmail.com")
 user_entry.grid(row=2, column=1,columnspan=2)
 
-pw_entry = Entry(text="", width=20)
+pw_entry = Entry(text="", width=35)
 pw_entry.grid(row=3,column=1)
 
 #Button
 
-add_button = Button(text="Add", width=36, command=save)
-add_button.grid(row=4,column=1,columnspan=2)
+search_button = Button(text="Search", width=20,command=search)
+search_button.grid(row=1, column=3)
 
-password_button = Button(text="Generate Password",command=generate_password)
-password_button.grid(row=3, column=2)
+add_button = Button(text="Add", width=56, command=save)
+add_button.grid(row=4,column=1,columnspan=3)
+
+password_button = Button(text="Generate Password",command=generate_password,width=20)
+password_button.grid(row=3, column=3)
 
 
 
